@@ -1,0 +1,12 @@
+{
+  "name": "SlimCompassSeed",
+  "version": "0.2",
+  "dependencies": {
+    "jquery": "~1.10.2",
+    "underscore": "latest",
+    "html5shiv": "latest",
+    "json2": "latest",
+    "modernizr": "latest"
+   },
+  "devDependencies": {}
+}

@@ -45,7 +45,7 @@ the following commands are from OSX may need to be adapted for other operating s
 
 #### Setup the project
 
-Once you have all of that stuff just run the following
+Once you have all of that stuff just run the following from the project's root folder.
 
 1. ````$ npm install````      
 	- installs all of the packages in package.json

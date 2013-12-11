@@ -2,11 +2,9 @@
 
 A minimal project seed for getting started quickly using **Slim** erb and **SCSS**.
 
-This project uses Node.js &amp; Grunt to compile SCSS & Slim in your development environment. There are addtional modules **commented out of the Gruntfile.js** for `JS linting`, automated testing with `Mocha`, compiling `Coffee Script` and using `JST templates`. These extra features may not be implemented correctly for your project.
+This project uses Node.js &amp; Grunt to compile SCSS & Slim in your development environment. There are addtional modules **commented out of the Gruntfile.js** automated testing with `Mocha`, compiling `Coffee Script` and using `JST templates`. These extra features may not be implemented correctly for your project.
 
 By default we're also using [Jquery](http://jquery.com/), [Normalize](https://github.com/necolas/normalize.css), [HTML5 Biolerplate](http://html5boilerplate.com/) &amp; [Modernizr](http://modernizr.com/).
-
-Also, there's no build process as of yet.
 
 #####SCSS#####
 By default we're including `SASS mixins` from [Bourbon](http://bourbon.io/docs/). Be sure to [visit the documentation](http://bourbon.io/docs/) for a full ist of available mixins.

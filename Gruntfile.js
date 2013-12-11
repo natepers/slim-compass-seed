@@ -26,12 +26,13 @@ module.exports = function (grunt) {
 
     grunt.initConfig({
         appName: appConfig,
+        pkg: grunt.file.readJSON('package.json'),
         watch: {
             options: {
                 nospawn: true
             },
             coffee: {
-                files: ['<%= appName.app %>/js/{,*/}*.coffee'],
+                files: ['<%= appName.app %>/scripts/{,*/}*.coffee'],
                 tasks: ['coffee:dist']
             },
             coffeeTest: {
@@ -46,7 +47,7 @@ module.exports = function (grunt) {
                 options: {
                     expand: true
                 },
-                files: ['slim/{,*/}*.slim'],
+                files: ['<%= appName.app %>/slim/{,*/}*.slim'],
                 tasks: ['slim']
               },
             livereload: {
@@ -55,18 +56,20 @@ module.exports = function (grunt) {
                 },
                 files: [
                     '<%= appName.app %>/*.html',
-                    '{.tmp,<%= appName.app %>}/css/{,*/}*.css',
-                    '{.tmp,<%= appName.app %>}/js/{,*/}*.js',
+                    '{.tmp,<%= appName.app %>}/styles/{,*/}*.css',
+                    '{.tmp,<%= appName.app %>}/scripts/{,*/}*.js',
                     '<%= appName.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp}',
-                    '<%= appName.app %>/js/templates/*.{ejs,mustache,hbs}'
+                    '<%= appName.app %>/scripts/templates/*.{ejs,mustache,hbs,jade}'
                 ]
             },
-            jst: {
-                files: [
-                    '<%= appName.app %>/js/templates/*.ejs'
-                ],
-                tasks: ['jst']
+            jade: {
+                files: ['<%= appName.app %>/scripts/templates/*.jade'],
+                tasks: ['jade']
             }
+            // jst: {
+            //     files: ['<%= appName.app %>/scripts/templates/*.ejs'],
+            //     tasks: ['jst']
+            // }
         },
         connect: {
             options: {
@@ -122,8 +125,8 @@ module.exports = function (grunt) {
             },
             all: [
                 'Gruntfile.js',
-                '<%= appName.app %>/js/{,*/}*.js',
-                '!<%= appName.app %>/js/vendor/*',
+                '<%= appName.app %>/scripts/{,*/}*.js',
+                '!<%= appName.app %>/scripts/vendor/*',
                 'test/spec/{,*/}*.js'
             ]
         },
@@ -141,9 +144,9 @@ module.exports = function (grunt) {
                     // rather than compiling multiple files here you should
                     // require them into your main .coffee file
                     expand: true,
-                    cwd: '<%= appName.app %>/js',
+                    cwd: '<%= appName.app %>/scripts',
                     src: '{,*/}*.coffee',
-                    dest: '.tmp/js',
+                    dest: '.tmp/scripts',
                     ext: '.js'
                 }]
             },
@@ -160,10 +163,10 @@ module.exports = function (grunt) {
         compass: {
             options: {
                 sassDir: '<%= appName.app %>/scss',
-                cssDir: '<%= appName.app %>/css',
+                cssDir: '.tmp/styles',
                 imagesDir: '<%= appName.app %>/images',
-                javascriptsDir: '<%= appName.app %>/js',
-                fontsDir: '<%= appName.app %>/css/fonts',
+                javascriptsDir: '<%= appName.app %>/scripts',
+                fontsDir: '.tmp/styles/fonts',
                 importPath: '<%= appName.app %>/scss',
                 relativeAssets: true
             },
@@ -180,7 +183,7 @@ module.exports = function (grunt) {
                 expand: true,
                 cwd: '<%= appName.app %>/slim',
                 src: ['{,*/}*.slim'],
-                dest: '<%= appName.app %>/html',
+                dest: '.tmp/partials',
                 ext: '.html'
               }]
             }
@@ -190,10 +193,11 @@ module.exports = function (grunt) {
                 // Options: https://github.com/jrburke/r.js/blob/master/build/example.build.js
                 options: {
                     // `name` and `out` is set by grunt-usemin
-                    baseUrl: '<%= appName.app %>/js',
+                    // out: '<%= appName.app %>/scripts',
+                    baseUrl: '<%= appName.app %>/scripts',
                     optimize: 'none',
                     paths: {
-                        'templates': '<%= appName.app %>/js/templates'
+                        'templates': '<%= appName.app %>/scripts/templates'
                     },
                     // TODO: Figure out how to make sourcemaps work with grunt-usemin
                     // https://github.com/appName/grunt-usemin/issues/30
@@ -207,6 +211,13 @@ module.exports = function (grunt) {
                 }
             }
         },
+        concat: {
+            options: {
+                separator: ';',
+                stripBanners: false,
+                banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' + '<%= grunt.template.today("yyyy-mm-dd") %> */',
+            }
+        },
         useminPrepare: {
             html: '<%= appName.app %>/index.html',
             options: {
@@ -215,7 +226,6 @@ module.exports = function (grunt) {
         },
         usemin: {
             html: ['<%= appName.dist %>/{,*/}*.html'],
-            css: ['<%= appName.dist %>/css/{,*/}*.css'],
             options: {
                 dirs: ['<%= appName.dist %>']
             }
@@ -233,9 +243,8 @@ module.exports = function (grunt) {
         cssmin: {
             dist: {
                 files: {
-                    '<%= appName.dist %>/css/app.css': [
-                        '.tmp/css/{,*/}*.css',
-                        '<%= appName.app %>/css/{,*/}*.css'
+                    '<%= appName.dist %>/styles/app.css': [
+                        '.tmp/styles/{,*/}*.css'
                     ]
                 }
             }
@@ -272,34 +281,46 @@ module.exports = function (grunt) {
                         '*.{ico,txt}',
                         '.htaccess',
                         'images/{,*/}*.{webp,gif}',
-                        'css/fonts/{,*/}*.*'
+                        'styles/fonts/{,*/}*.*'
                     ]
                 }]
             }
         },
         bower: {
             all: {
-                rjsConfig: '<%= appName.app %>/js/main.js'
+                rjsConfig: '<%= appName.app %>/scripts/app.js'
             }
         },
-        jst: {
+        jade: {
+          compile: {
             options: {
-                amd: true
+              data: {
+                debug: false
+              }
             },
-            compile: {
-                files: {
-                    '<%= appName.app %>/js/templates.js': ['<%= appName.app %>/js/templates/*.ejs']
-                }
+            files: {
+              ".tmp/scripts/templates.js": ["/scripts/templates/*.jade"]
             }
+          }
         },
+        // jst: {
+        //     options: {
+        //         amd: true
+        //     },
+        //     compile: {
+        //         files: {
+        //             '<%= appName.app %>/scripts/templates.js': ['<%= appName.app %>/scripts/templates/*.ejs']
+        //         }
+        //     }
+        // },
         rev: {
             dist: {
                 files: {
                     src: [
-                        '<%= appName.dist %>/js/{,*/}*.js',
-                        '<%= appName.dist %>/css/{,*/}*.css',
+                        '<%= appName.dist %>/scripts/{,*/}*.js',
+                        '<%= appName.dist %>/styles/{,*/}*.css',
                         '<%= appName.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp}',
-                        '/css/fonts/{,*/}*.*'
+                        '/styles/fonts/{,*/}*.*'
                     ]
                 }
             }
@@ -307,7 +328,7 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('createDefaultTemplate', function () {
-        grunt.file.write('.tmp/js/templates.js', 'this.JST = this.JST || {};');
+        grunt.file.write('.tmp/scripts/templates.js', 'this.JST = this.JST || {};');
     });
 
     grunt.registerTask('server', function (target) {
@@ -345,7 +366,7 @@ module.exports = function (grunt) {
         //'jst',
         'compass',
         'slim',
-        'connect:test',
+        'connect:test'
         //'mocha'
     ]);
 
@@ -357,12 +378,12 @@ module.exports = function (grunt) {
         'compass:dist',
         'slim',
         'useminPrepare',
-        'requirejs',
+        //'requirejs',
         'imagemin',
         'htmlmin',
         'concat',
-        'cssmin',
         'uglify',
+        'cssmin',
         'copy',
         'rev',
         'usemin'
